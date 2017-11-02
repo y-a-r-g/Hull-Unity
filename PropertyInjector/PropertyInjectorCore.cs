@@ -86,25 +86,21 @@ namespace Hull.Unity.PropertyInjector {
         }
 
         public void InitFromCache() {
-            string fileName = null;
-            var persistentLevel = Path.Combine(Application.persistentDataPath, FileName);
-            if (File.Exists(persistentLevel)) {
-                fileName = persistentLevel;
-            }
+            var sources = new[] {Path.Combine(Application.persistentDataPath, FileName), Path.Combine(Application.streamingAssetsPath, FileName)};
+            for (var i = 0; i < sources.Length; i++) {
+                var fileName = sources[i];
 
-            var streamingLevel = Path.Combine(Application.streamingAssetsPath, FileName);
-            if (File.Exists(streamingLevel)) {
-                fileName = streamingLevel;
-            }
+                if (File.Exists(fileName)) {
+                    try {
+                        using (var stream = new FileStream(fileName, FileMode.Open)) {
+                            _values = (Dictionary<string, List<KeyValuePair<string, string>>>)SerializationUtils.BinaryFormatter
+                                .Deserialize(stream);
+                        }
 
-            if ((fileName != null) && File.Exists(fileName)) {
-                try {
-                    using (var stream = new FileStream(fileName, FileMode.Open)) {
-                        _values = (Dictionary<string, List<KeyValuePair<string, string>>>)SerializationUtils.BinaryFormatter
-                            .Deserialize(stream);
+                        break;
                     }
+                    catch { }
                 }
-                catch { }
             }
 
             if (_values == null) {
