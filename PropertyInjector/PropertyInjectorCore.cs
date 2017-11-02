@@ -85,7 +85,7 @@ namespace Hull.Unity.PropertyInjector {
             }
         }
 
-        private void InitFromCache() {
+        public void InitFromCache() {
             string fileName = null;
             var persistentLevel = Path.Combine(Application.persistentDataPath, FileName);
             if (File.Exists(persistentLevel)) {
